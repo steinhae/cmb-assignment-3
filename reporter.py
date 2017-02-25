@@ -104,6 +104,8 @@ def write_geofence_measurements(measurements, data_fields):
     geofences = []
     geofences.append(CircleGeofence('munich_area', 48.138561, 11.573757, 7000))
     geofences.append(CircleGeofence('tum_mi', 48.262547, 11.667838, 150))
+    geofences.append(CircleGeofence('hannes_home', 51.806646, 10.456883, 35000))
+    geofences.append(CircleGeofence('patricks_home', 46.344574, 11.241863, 35000))
     for geofence in geofences:
         write_csv_for_geofence(measurements, geofence, data_fields)
 
