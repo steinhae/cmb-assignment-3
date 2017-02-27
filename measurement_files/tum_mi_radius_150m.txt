@@ -1,2 +1,0 @@
-All cellular measurements that got taken within a radius of 150 meters from MI building (48.262547, 11.667838).
-http://obeattie.github.io/gmaps-radius/?radiusInput=100&unitSelector=mt&lat=48.262578&lng=11.66828&z=17&u=mt&r=150
