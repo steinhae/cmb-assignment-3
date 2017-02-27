@@ -1,2 +1,0 @@
-Munich area - 48.138561, 11.573757 - 7km radius
-http://obeattie.github.io/gmaps-radius/?radiusInput=7&unitSelector=km&lat=48.162782&lng=11.614792&z=12&u=km&r=7
