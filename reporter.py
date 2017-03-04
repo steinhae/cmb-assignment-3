@@ -74,35 +74,35 @@ def data_rate_statistic_report(measurements):
             plot_data_rate_time(name, measurements_for_location)
 
 def plot_data_rate_time(name, measurements_for_location):
-
-    # TODO: seperate WIFI and Cellular (one data layer for each)
     plot_values = []
     labels = []
     for measurement in measurements_for_location:
         if measurement['downlink'] != '':
             plot_values.append(measurement['downlink'])
+            connection_type = 'W' if measurement['radiotech'] == '0' else 'C'
             #labels.append(measurement['startedAt'][10:len(measurement['startedAt'])-3])
-            labels.append(measurement['startedAt'])
+            labels.append(measurement['startedAt'] + ' (' + connection_type + ')')
 
     # Reverse the lists/labels so they are in ascending measurement order
     plot_values.reverse()
     labels.reverse()
     axis_bgcolor = '#f0f0f0'
-    figure, ax = plt.subplots()
+    figure, ax1 = plt.subplots()
 
-    ax.plot(plot_values)
-    ax.set_xticks(map(lambda x: x, range(0, len(plot_values))))
-    ax.set_xticklabels(labels, rotation=45, rotation_mode='anchor', ha='right')
-    ax.yaxis.grid(True)
-    ax.xaxis.grid(True)
+    ax1.plot(plot_values)
+    ax1.set_xticks(map(lambda x: x, range(0, len(plot_values))))
+    ax1.set_xticklabels(labels, rotation=45, rotation_mode='anchor', ha='right')
+    ax1.yaxis.grid(True)
+    ax1.xaxis.grid(True)
 
-    ax.set_facecolor(axis_bgcolor)
-    ax.set_title('Data rate time: ' + name)
-    ax.set_xlabel('Time')
+    ax1.set_facecolor(axis_bgcolor)
+    ax1.set_title('Downlink / time: ' + name)
+    ax1.set_xlabel('Time')
     #ax.axes.get_xaxis().set_visible(False)
-    ax.set_ylabel('Data rate in kbit/s')
+    ax1.set_ylabel('Data rate in kbit/s')
+
     plt.tight_layout()
-    plt.savefig(graphs_path + name + '_data_rate_time.png')
+    plt.savefig(graphs_path + name + '_downlink_time.png')
     plt.show()
 
 def print_plot_data_rate_statistic(name, downlink, uplink, count):
