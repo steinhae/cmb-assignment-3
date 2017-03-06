@@ -2,4 +2,4 @@
 
 # Pycharm IDE files
 .idea/
-cmb-assignment-2.iml
+*.pyc
