@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import os
 import argparse
+import collections
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -21,7 +22,7 @@ from .split_by_geofence import write_geofence_measurements
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-r', '--report', choices=['stats', '1', 'splitByGeofence', '2',
-                                                   'plotDist', '3', 'report', '4'],
+                                                   'plotDist', '3', 'report', '4', '5'],
                         help='available report types\n'
                              '1 - statistics\n'
                              '2 - write measurements for geofences\n'
@@ -43,11 +44,56 @@ def main():
             write_geofence_measurements(measurements, data_fields)
         elif args.report == '4':
             data_rate_statistic_report(measurements)
+        elif args.report == '5':
+            download, upload, _ = get_downlink_uplink_as_array(measurements)
+            plot_boxplot(download, 'download')
+            plot_boxplot(upload, 'upload')
+            for location_key, location in locations.items():
+                measurements_for_location = get_measurements_per_geofence(
+                    CircleGeofence(location, 500),
+                    measurements)
+                download, upload, _ = get_downlink_uplink_as_array(measurements_for_location)
+                plot_boxplot(download, location_key + '-download')
+                plot_boxplot(upload, location_key + '-upload')
 
+            vendors = get_vendors_dict(measurements)
+
+            # vendor plots
+            plot_boxplots_for_dict(vendors)
+            # vendors pie
+            plot_pie_for_dict(vendors)
+
+            providers = get_measurements_per_provider(measurements)
+
+            # provider plots
+            plot_boxplots_for_dict(providers)
+            # provider pie
+            plot_pie_for_dict(providers)
+
+
+def plot_pie_for_dict(dct):
+    names = dct.keys()
+    values = [len(v_m) for v_m in dct.values()]
+    total_sum = float(sum(values))
+    percentages = [value / total_sum for value in values]
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    colors = ['#0486e7', '#fadc4a', '#ff0000', '#00ff00']
+    ax.pie(percentages, colors=colors[:len(percentages)], labels=names,
+           autopct='%1.1f%%', pctdistance=0.6, textprops={'fontsize': 14})
+    plt.savefig(os.path.join(graphs_path, 'providers-pie.pdf'), format='pdf', dpi=2000)
+    plt.close(fig)
+
+
+def plot_boxplots_for_dict(dct):
+    for name, measurements in dct.items():
+        download, upload, _ = get_downlink_uplink_as_array(measurements)
+        plot_boxplot(download, name + '-donwload-{}'.format(len(measurements)))
+        plot_boxplot(upload, name + '-upload-{}'.format(len(measurements)))
 
 def data_rate_statistic_report(measurements):
     for location_key, location in locations.items():
-        measurements_for_location = get_measurements_per_geofence(CircleGeofence(location_key, 500),
+        measurements_for_location = get_measurements_per_geofence(CircleGeofence(location, 500),
                                                                   measurements)
         if len(measurements_for_location) > 0:
 
@@ -168,6 +214,26 @@ def get_downlink_uplink_as_array(measurements):
     return downlink, uplink, measurements_used
 
 
+def plot_boxplot(data, name):
+    if not data:
+        print('{} contains no data'.format(name))
+        return
+
+    data.sort()
+    fig, ax = plt.subplots()
+    median = np.median(data)
+    lower_quartil = np.percentile(data, 25)
+    upper_quartil = np.percentile(data, 75)
+    lower_whisker = np.percentile(data, 2.5)
+    upper_whisker = np.percentile(data, 97.5)
+
+    ax.boxplot(data, 0, 'gD')
+    ax.set_ylabel('Data rate')
+    plt.savefig(os.path.join(graphs_path, name + '-boxplot.pdf'), format='pdf', dpi=2000)
+    plt.close(fig)
+
+
+
 def plot_clustered_measurements_vendor(show_plots):
     # Credits to Geoff Boeing
     # @http://geoffboeing.com/2014/08/clustering-to-reduce-spatial-data-set-size/
@@ -230,18 +296,27 @@ def print_measurement_statistics_report(measurements):
     print('Statistics:')
     print('# measurements = {}'.format(overall))
     print('# wifi = {} {}'.format(wifi, get_percentage_formated(wifi, overall)))
-    print('# cellular = {} {}'.format(overall-wifi, get_percentage_formated(wifi, overall)))
+    print('# cellular = {} {}'.format(overall-wifi, get_percentage_formated(overall-wifi, overall)))
     print_measurements_per_vendor(measurements)
 
 
+def get_vendors_dict(measurements):
+    vendors = collections.defaultdict(list)
+    for measurement in clean_measurements(measurements):
+        vendors[measurement['vendor']].append(measurement)
+
+    return vendors
+
+
 def print_measurements_per_vendor(measurements):
-    vendors = []
-    for line in measurements:
-        if line['vendor'] not in vendors:
-            vendors.append(line['vendor'])
-    for vendor in vendors:
-        share = len(get_measurements_per_vendor(vendor, measurements))
-        print('# {} = {} {}'.format(vendor, share, get_percentage_formated(share, len(measurements))))
+    vendors = get_vendors_dict(measurements)
+
+    total_sum = sum([len(v) for v in vendors])  # excludes measurements with uplink and downlink = 0
+
+    for vendor_name in vendors:
+        share = len(vendors[vendor_name])
+        print('# {} = {} {}'.format(vendors[vendor_name], share,
+                                    get_percentage_formated(share, total_sum)))
 
 
 def get_measurements_per_vendor(vendor, data):
@@ -250,6 +325,22 @@ def get_measurements_per_vendor(vendor, data):
         if line['vendor'] == vendor:
             result.append(line)
     return result
+
+
+def get_measurements_per_provider(measurements):
+    providers = collections.defaultdict(list)
+
+    for measurement in measurements:
+        if measurement['network.operator'] and measurement['network.operator'] != '-':
+            providers[measurement['network.operator']].append(measurement)
+
+    return providers
+
+
+def clean_measurements(measurements):
+    return [measurement for measurement in measurements
+                      if measurement['downlink'] and measurement['uplink'] and
+                      float(measurement['downlink']) > 0 and float(measurement['downlink']) > 0]
 
 
 if __name__ == '__main__':
