@@ -311,14 +311,14 @@ def get_centermost_point(cluster):
 
 def print_measurement_statistics_report(measurements):
     overall = len(measurements)
-    wifi = 0
-    for line in measurements:
-        if line['radiotech'] == '0':
-            wifi = wifi + 1
+    clean = clean_measurements(measurements)
+    clean_len = len(clean)
+    wifi = len(list(filter(lambda x: x['radiotech'] == '0', clean)))
     print('Statistics:')
     print('# measurements = {}'.format(overall))
-    print('# wifi = {} {}'.format(wifi, get_percentage_formated(wifi, overall)))
-    print('# cellular = {} {}'.format(overall-wifi, get_percentage_formated(overall-wifi, overall)))
+    print('# measurements clean = {}'.format(clean_len))
+    print('# wifi clean = {} {}'.format(wifi, get_percentage_formated(wifi, clean_len)))
+    print('# cellular clean = {} {}'.format(clean_len-wifi, get_percentage_formated(clean_len-wifi, clean_len)))
     print_measurements_per_vendor(measurements)
 
 
@@ -333,11 +333,11 @@ def get_vendors_dict(measurements):
 def print_measurements_per_vendor(measurements):
     vendors = get_vendors_dict(measurements)
 
-    total_sum = sum([len(v) for v in vendors])  # excludes measurements with uplink and downlink = 0
+    total_sum = sum([len(v) for v in vendors.itervalues()])  # excludes measurements with uplink and downlink = 0
 
     for vendor_name in vendors:
         share = len(vendors[vendor_name])
-        print('# {} = {} {}'.format(vendors[vendor_name], share,
+        print('# {} = {} {}'.format(vendor_name, share,
                                     get_percentage_formated(share, total_sum)))
 
 
