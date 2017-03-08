@@ -135,35 +135,53 @@ def data_rate_statistic_report(measurements):
 
 def plot_data_rate_time(name, measurements_for_location):
     plot_values = []
-    labels = []
-    for measurement in measurements_for_location:
+    for index, measurement in enumerate(measurements_for_location):
         if measurement['downlink'] != '':
             plot_values.append(measurement['downlink'])
             connection_type = 'W' if measurement['radiotech'] == '0' else 'C'
             # labels.append(measurement['startedAt'][10:len(measurement['startedAt'])-3])
-            labels.append(measurement['startedAt'] + ' (' + connection_type + ')')
 
     # Reverse the lists/labels so they are in ascending measurement order
     plot_values.reverse()
-    labels.reverse()
+    labels = [str(i + 1) for i in range(0, len(plot_values))]
+    x_labels = ['0']
+
+    if len(labels) > 10:
+        tick = 5
+        if len(labels) > 100:
+            tick = 10
+        for index in range(0, len(labels) + tick - 1):
+            if (index + 1) % tick == 0:
+                if index >= len(labels):
+                    x_labels.append(str(index + 1))
+                    break
+                x_labels.append(labels[index])
+            else:
+                x_labels.append('')
+    else:
+        x_labels = labels
+
     axis_bgcolor = '#f0f0f0'
     figure, ax1 = plt.subplots()
 
     ax1.plot(plot_values)
-    ax1.set_xticks(map(lambda x: x, range(0, len(plot_values))))
-    ax1.set_xticklabels(labels, rotation=45, rotation_mode='anchor', ha='right')
+    ax1.set_xlim(xmin=0)
+    ax1.set_ylim(ymin=0)
+    ax1.set_xticks(map(lambda x: x, range(0, len(x_labels) + 1)))
+    ax1.set_xticklabels(x_labels, rotation=45, rotation_mode='anchor', ha='right')
     ax1.yaxis.grid(True)
     ax1.xaxis.grid(True)
 
     ax1.set_facecolor(axis_bgcolor)
     ax1.set_title('Downlink / time: ' + name)
-    ax1.set_xlabel('Time')
+    ax1.set_xlabel('Measurement number')
     # ax.axes.get_xaxis().set_visible(False)
     ax1.set_ylabel('Data rate in kbit/s')
 
     plt.tight_layout()
     plt.savefig(os.path.join(graphs_path, name + '_downlink_time.pdf'), format='pdf', dpi=2000)
     plt.show()
+    plt.close(figure)
 
 
 def print_plot_data_rate_statistic(name, downlink, uplink, count):
