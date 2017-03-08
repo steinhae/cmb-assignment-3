@@ -45,16 +45,12 @@ def main():
         elif args.report == '4':
             data_rate_statistic_report(measurements)
         elif args.report == '5':
-            download, upload, _ = get_downlink_uplink_as_array(measurements)
-            plot_boxplot(download, 'download')
-            plot_boxplot(upload, 'upload')
-            for location_key, location in locations.items():
-                measurements_for_location = get_measurements_per_geofence(
-                    CircleGeofence(location, 500),
-                    measurements)
-                download, upload, _ = get_downlink_uplink_as_array(measurements_for_location)
-                plot_boxplot(download, location_key + '-download')
-                plot_boxplot(upload, location_key + '-upload')
+            plot_boxplots_for_locations(measurements, 'all')
+
+            wifi_measurements, mobile_data_measurements = split_wifi_mobile_data(measurements)
+
+            plot_boxplots_for_locations(wifi_measurements, 'wifi')
+            plot_boxplots_for_locations(mobile_data_measurements, 'mobile')
 
             vendors = get_vendors_dict(measurements)
 
@@ -63,7 +59,7 @@ def main():
             # vendors pie
             plot_pie_for_dict(vendors)
 
-            providers = get_measurements_per_provider(measurements)
+            providers = get_measurements_per_provider(mobile_data_measurements)
 
             # provider plots
             plot_boxplots_for_dict(providers)
@@ -90,6 +86,32 @@ def plot_boxplots_for_dict(dct):
         download, upload, _ = get_downlink_uplink_as_array(measurements)
         plot_boxplot(download, name + '-donwload-{}'.format(len(measurements)))
         plot_boxplot(upload, name + '-upload-{}'.format(len(measurements)))
+
+
+def split_wifi_mobile_data(measurements):
+    wifi_measurements = []
+    mobile_data_measurements = []
+    for measurement in measurements:
+        if measurement['radiotech'] == '0':
+            wifi_measurements.append(measurement)
+        else:
+            mobile_data_measurements.append(measurement)
+
+    return wifi_measurements, mobile_data_measurements
+
+
+def plot_boxplots_for_locations(measurements, name):
+    download, upload, _ = get_downlink_uplink_as_array(measurements)
+    plot_boxplot(download, name + '-' + 'download-{}'.format(len(download)))
+    plot_boxplot(upload, name + '-' + 'upload-{}'.format(len(upload)))
+    for location_key, location in locations.items():
+        measurements_for_location = get_measurements_per_geofence(
+            CircleGeofence(location, 500),
+            measurements)
+        download, upload, _ = get_downlink_uplink_as_array(measurements_for_location)
+        plot_boxplot(download, name + '-' + location_key + '-download-{}'.format(len(download)))
+        plot_boxplot(upload, name + '-' + location_key + '-upload-{}'.format(len(upload)))
+
 
 def data_rate_statistic_report(measurements):
     for location_key, location in locations.items():
