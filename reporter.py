@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import argparse
 import collections
+import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -108,6 +109,9 @@ def plot_boxplots_for_locations(measurements, name):
         measurements_for_location = get_measurements_per_geofence(
             CircleGeofence(location, 500),
             measurements)
+
+        plot_hour_comparision(measurements_for_location, name + '-' + location_key)
+
         download, upload, _ = get_downlink_uplink_as_array(measurements_for_location)
         plot_boxplot(download, name + '-' + location_key + '-download-{}'.format(len(download)))
         plot_boxplot(upload, name + '-' + location_key + '-upload-{}'.format(len(upload)))
@@ -182,6 +186,56 @@ def plot_data_rate_time(name, measurements_for_location):
     plt.savefig(os.path.join(graphs_path, name + '_downlink_time.pdf'), format='pdf', dpi=2000)
     plt.show()
     plt.close(figure)
+
+
+def plot_hour_comparision(measurements, name):
+    hours_dict = collections.defaultdict(list)
+    if not measurements:
+        return
+
+    for measurement in measurements:
+        time = datetime.datetime.strptime(measurement['startedAt'], '%Y-%m-%d %H:%M:%S')
+        hours_dict[time.hour].append(measurement)
+
+    hours_average_list = []
+
+    for hour, hour_measurements in hours_dict.items():
+        downlink, uplink, _ = get_downlink_uplink_as_array(hour_measurements)
+        hours_average_list.append((hour, (sum(downlink)/float(len(downlink)), sum(uplink)/float(len(uplink)))))
+
+    hours_average_list.sort(key=lambda x: x[0])
+    labels, averages = tuple(zip(*hours_average_list))
+    labels = list(labels)
+    averages = list(averages)
+
+    for i in range(0, 24):
+        if i not in labels:
+            labels.insert(i, i)
+            averages.insert(i, (0,0))
+
+
+    fig, ax = plt.subplots()
+
+    first_pos = [l*1.4 for l in labels]
+    sec_pos = [l + 0.6 for l in first_pos]
+    x_ticks = [l + 0.3 for l in first_pos]
+    ax.bar(first_pos, [avg[0] for avg in averages], width=0.6, label='downlink')
+    ax.bar(sec_pos, [avg[1] for avg in averages], width=0.6, label='uplink')
+    ax.set_xticks(x_ticks)
+    for i in range(0, len(labels)):
+        if labels[i] in hours_dict:
+            labels[i] = str(labels[i]) + '\n({})'.format(len(hours_dict[labels[i]]))
+    ax.set_xticklabels(labels)
+    ax.set_xlim(xmin=-0.5, xmax=max(x_ticks) + 0.8)
+    ax.set_ylim(ymin=0)
+
+    ax.set_title('Average up/downlink per hour of day')
+    ax.set_xlabel('Hour of day (number of measurements per period in brackets)')
+    ax.legend(loc='upper right')
+    plt.subplots_adjust(bottom=0.15)
+    plt.savefig(os.path.join(graphs_path, name + '-hourly-up-downlink.pdf'), format='pdf', dpi=2000)
+
+    plt.close(fig)
 
 
 def print_plot_data_rate_statistic(name, downlink, uplink, count):
