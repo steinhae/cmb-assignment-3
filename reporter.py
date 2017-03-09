@@ -79,7 +79,7 @@ def plot_pie_for_dict(dct):
     colors = ['#0486e7', '#fadc4a', '#ff0000', '#00ff00']
     ax.pie(percentages, colors=colors[:len(percentages)], labels=names,
            autopct='%1.1f%%', pctdistance=0.6, textprops={'fontsize': 14})
-    plt.savefig(os.path.join(graphs_path, 'providers-pie.pdf'), format='pdf', dpi=2000)
+    plt.savefig(os.path.join(graphs_path, 'providers-pie.png'), format='png', dpi=400)
     plt.close(fig)
 
 
@@ -184,7 +184,7 @@ def plot_data_rate_time(name, measurements_for_location):
     ax1.set_ylabel('Data rate in kbit/s')
 
     plt.tight_layout()
-    plt.savefig(os.path.join(graphs_path, name + '_downlink_time.pdf'), format='pdf', dpi=2000)
+    plt.savefig(os.path.join(graphs_path, name + '_downlink_time.png'), format='png', dpi=400)
     plt.show()
     plt.close(figure)
 
@@ -234,7 +234,7 @@ def plot_hour_comparision(measurements, name):
     ax.set_xlabel('Hour of day (number of measurements per period in brackets)')
     ax.legend(loc='upper right')
     plt.subplots_adjust(bottom=0.15)
-    plt.savefig(os.path.join(graphs_path, name + '-hourly-up-downlink.pdf'), format='pdf', dpi=2000)
+    plt.savefig(os.path.join(graphs_path, name + '-hourly-up-downlink.png'), format='png', dpi=400)
 
     plt.close(fig)
 
@@ -289,7 +289,7 @@ def data_rate_statistic_plot(name, data):
     ax.set_ylabel('Data rate in kbit/s')
 
     plt.tight_layout()
-    plt.savefig(os.path.join(graphs_path, name + '_data_rate_statistic.pdf'), format='pdf', dpi=2000)
+    plt.savefig(os.path.join(graphs_path, name + '_data_rate_statistic.png'), format='png', dpi=400)
 
 
 def get_downlink_uplink_as_array(measurements):
@@ -324,7 +324,7 @@ def plot_boxplot(data, name):
 
     ax.boxplot(data, 0, 'gD')
     ax.set_ylabel('Data rate')
-    plt.savefig(os.path.join(graphs_path, name + '-boxplot.pdf'), format='pdf', dpi=2000)
+    plt.savefig(os.path.join(graphs_path, name + '-boxplot.png'), format='png', dpi=400)
     plt.close(fig)
 
 
@@ -371,7 +371,7 @@ def plot_clustered_measurements_vendor(show_plots):
                 xycoords='data',
                 arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0.5', color='k', alpha=0.8))
 
-    plt.savefig(graphs_path + 'clustered_measurements_vendor.pdf', format='pdf', dpi=2000)
+    plt.savefig(graphs_path + 'clustered_measurements_vendor.png', format='png', dpi=400)
     if show_plots:
         plt.show()
 
