@@ -3,3 +3,5 @@
 # Pycharm IDE files
 .idea/
 *.pyc
+*.png
+*.csv
