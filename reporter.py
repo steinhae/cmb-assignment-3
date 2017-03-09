@@ -23,12 +23,13 @@ from .split_by_geofence import write_geofence_measurements
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-r', '--report', choices=['stats', '1', 'splitByGeofence', '2',
-                                                   'plotDist', '3', 'report', '4', '5'],
+                                                   'plotDist', '3', 'report', '4', 'vendor/provider plots', '5'],
                         help='available report types\n'
-                             '1 - statistics\n'
-                             '2 - write measurements for geofences\n'
-                             '3 - plot location distributions\n'
-                             '4 - data rate/time report',
+                             '1 - print: statistics\n'
+                             '2 - write: measurements for geofences\n'
+                             '3 - plot: location distributions\n'
+                             '4 - data rate/time report\n'
+                             '5 - plot: vendor / provider box- and pie plots',
                         required=True)
     parser.add_argument('-s', '--show-plots', dest='show_plots', action='store_true',
                         help='show the plots instead of just saving them')
