@@ -92,7 +92,7 @@ def plot_pie_for_dict(dct):
 def plot_boxplots_for_dict(dct):
     for name, measurements in dct.items():
         download, upload, _ = get_downlink_uplink_as_array(measurements)
-        plot_boxplot(download, name + '-donwload-{}'.format(len(measurements)))
+        plot_boxplot(download, name + '-download-{}'.format(len(measurements)))
         plot_boxplot(upload, name + '-upload-{}'.format(len(measurements)))
 
 
