@@ -207,7 +207,9 @@ def plot_hour_comparision(measurements, name):
 
     for hour, hour_measurements in hours_dict.items():
         downlink, uplink, _ = get_downlink_uplink_as_array(hour_measurements)
-        hours_average_list.append((hour, (sum(downlink)/float(len(downlink)), sum(uplink)/float(len(uplink)))))
+
+        if len(downlink) > 0 and len(uplink) > 0:
+            hours_average_list.append((hour, (sum(downlink)/float(len(downlink)), sum(uplink)/float(len(uplink)))))
 
     hours_average_list.sort(key=lambda x: x[0])
     labels, averages = tuple(zip(*hours_average_list))
