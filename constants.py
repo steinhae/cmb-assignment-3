@@ -15,8 +15,9 @@ locations = {
     'munich_area': Location('munich_area', 48.138561, 11.573757)
 }
 
-geofences = [CircleGeofence(locations['munich_area'], 7000),
-             CircleGeofence(locations['tum_mi'], 150),
-             CircleGeofence(locations['hannes_home'], 35000),
-             CircleGeofence(locations['patricks_home'], 35000)
-             ]
+geofences = {
+    'munich_area': CircleGeofence(locations['munich_area'], 7000),
+    'tum_mi': CircleGeofence(locations['tum_mi'], 150),
+    'hannes_home': CircleGeofence(locations['hannes_home'], 35000),
+    'patricks_home': CircleGeofence(locations['patricks_home'], 35000)
+}

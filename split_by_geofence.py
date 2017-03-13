@@ -10,7 +10,7 @@ from .geofence_util import get_measurements_per_geofence
 
 
 def write_geofence_measurements(measurements, data_fields):
-    for geofence in geofences:
+    for geofence in geofences.values():
         write_csv_for_geofence(measurements, geofence, data_fields)
 
 

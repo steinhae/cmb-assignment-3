@@ -14,8 +14,8 @@ from sklearn.cluster import DBSCAN
 from geopy.distance import great_circle
 from shapely.geometry import MultiPoint
 
-from .util import read_csv, CircleGeofence, get_formated, get_percentage_formated
-from .constants import locations, measurements_path, graphs_path, generated_measurements_path
+from .util import read_csv, get_formated, get_percentage_formated
+from .constants import locations, measurements_path, graphs_path, generated_measurements_path, geofences
 from .geofence_util import get_measurements_per_geofence
 from .split_by_geofence import write_geofence_measurements
 
@@ -114,8 +114,7 @@ def plot_boxplots_for_locations(measurements, name):
     plot_boxplot(upload, name + '-' + 'upload-{}'.format(len(upload)))
     for location_key, location in locations.items():
         measurements_for_location = get_measurements_per_geofence(
-            CircleGeofence(location, 500),
-            measurements)
+            geofences[location_key], measurements)
 
         plot_hour_comparision(measurements_for_location, name + '-' + location_key)
 
@@ -126,7 +125,7 @@ def plot_boxplots_for_locations(measurements, name):
 
 def data_rate_statistic_report(measurements):
     for location_key, location in locations.items():
-        measurements_for_location = get_measurements_per_geofence(CircleGeofence(location, 500),
+        measurements_for_location = get_measurements_per_geofence(geofences[location_key],
                                                                   measurements)
         if len(measurements_for_location) > 0:
 
