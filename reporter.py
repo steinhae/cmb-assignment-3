@@ -15,7 +15,7 @@ from geopy.distance import great_circle
 from shapely.geometry import MultiPoint
 
 from .util import read_csv, CircleGeofence, get_formated, get_percentage_formated
-from .constants import locations, measurements_path, graphs_path
+from .constants import locations, measurements_path, graphs_path, generated_measurements_path
 from .geofence_util import get_measurements_per_geofence
 from .split_by_geofence import write_geofence_measurements
 
@@ -34,6 +34,12 @@ def main():
     parser.add_argument('-s', '--show-plots', dest='show_plots', action='store_true',
                         help='show the plots instead of just saving them')
     args = parser.parse_args()
+
+    if not os.path.exists(generated_measurements_path):
+        os.makedirs(generated_measurements_path)
+
+    if not os.path.exists(graphs_path):
+        os.makedirs(graphs_path)
 
     if args.report == '3':
         plot_clustered_measurements_vendor(args.show_plots)
@@ -86,7 +92,7 @@ def plot_pie_for_dict(dct):
 def plot_boxplots_for_dict(dct):
     for name, measurements in dct.items():
         download, upload, _ = get_downlink_uplink_as_array(measurements)
-        plot_boxplot(download, name + '-donwload-{}'.format(len(measurements)))
+        plot_boxplot(download, name + '-download-{}'.format(len(measurements)))
         plot_boxplot(upload, name + '-upload-{}'.format(len(measurements)))
 
 
