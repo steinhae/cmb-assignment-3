@@ -149,7 +149,6 @@ def plot_data_rate_time(name, measurements_for_location):
         if measurement['downlink'] != '':
             plot_values.append(measurement['downlink'])
             connection_type = 'W' if measurement['radiotech'] == '0' else 'C'
-            # labels.append(measurement['startedAt'][10:len(measurement['startedAt'])-3])
 
     # Reverse the lists/labels so they are in ascending measurement order
     plot_values.reverse()
@@ -185,7 +184,6 @@ def plot_data_rate_time(name, measurements_for_location):
     ax1.set_facecolor(axis_bgcolor)
     ax1.set_title('Downlink / time: ' + name)
     ax1.set_xlabel('Measurement number')
-    # ax.axes.get_xaxis().set_visible(False)
     ax1.set_ylabel('Data rate in kbit/s')
 
     plt.tight_layout()
@@ -284,7 +282,6 @@ def data_rate_statistic_plot(name, data):
 
     axis_bgcolor = '#f0f0f0'
     figure, ax = plt.subplots()
-    # ax.plot(plot_values)
     ax.bar(ind, plot_values, 0.35)
     ax.set_xticks(map(lambda x: x, range(0, len(data))))
     ax.set_xticklabels(labels, rotation=45, rotation_mode='anchor', ha='right')
@@ -369,7 +366,7 @@ def plot_clustered_measurements_vendor(show_plots):
     ax.set_ylabel('Latitude')
     ax.legend([df_scatter, rs_scatter], ['Full set', 'Clustered set'], loc='upper right')
 
-    # #annotate clusters with vendor names
+    # annotate clusters with vendor names
     for i, row in rs.iterrows():
         ax.annotate(row['vendor'],
                 xy=(row['longitude'], row['latitude']),
@@ -413,7 +410,8 @@ def get_vendors_dict(measurements):
 def print_measurements_per_vendor(measurements):
     vendors = get_vendors_dict(measurements)
 
-    total_sum = sum([len(v) for v in vendors.itervalues()])  # excludes measurements with uplink and downlink = 0
+    # excludes measurements with uplink and downlink = 0
+    total_sum = sum([len(v) for v in vendors.itervalues()])
 
     for vendor_name in vendors:
         share = len(vendors[vendor_name])
