@@ -45,7 +45,7 @@ def main():
         plot_clustered_measurements_vendor(args.show_plots)
     else:
         measurements, data_fields = read_csv(
-            os.path.join(measurements_path, 'measurements_clean.csv'))
+            os.path.join(measurements_path, 'measurements.csv'))
         if args.report == '1':
             print_measurement_statistics_report(measurements)
         elif args.report == '2':
@@ -336,7 +336,7 @@ def plot_boxplot(data, name):
 def plot_clustered_measurements_vendor(show_plots):
     # Credits to Geoff Boeing
     # @http://geoffboeing.com/2014/08/clustering-to-reduce-spatial-data-set-size/
-    df = pd.read_csv(os.path.join(measurements_path, 'measurements_clean.csv'))
+    df = pd.read_csv(os.path.join(measurements_path, 'measurements.csv'))
     df['latitude'].replace('-', np.nan, inplace=True)
     df.dropna(subset=['latitude'], inplace=True)
     df['longitude'].replace('-', np.nan, inplace=True)
