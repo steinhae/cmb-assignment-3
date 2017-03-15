@@ -1,8 +1,11 @@
 # Meaurement Evaluation (assignment 3)
 ## Group3
 
+Place the measurements csv into the `measurements` directory and name it 
+`measurements.csv`
+
 To execute `reporter.py` use the following command and execute it from the 
-parent directory (`./..`)
+parent directory
 
 ```python -m cmb-assignment-3.reporter -r [option]```
 
